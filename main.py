@@ -23,7 +23,7 @@ import time
 import sys
 import os
 
-database_credentials = "host=73.67.210.16 user=nmaciel password=20201230@Bolder dbname=nanahub"
+database_credentials = ""
 conn = psy.connect(database_credentials)
 cur = conn.cursor()
 
@@ -111,42 +111,65 @@ class Widget_View_Header():
         self.live_calender()
         self.live_clock()
 
-class Widget_Login_Pad():
-    def id_display_controller(self, btn_value):
-        index = 0
-        live_id_input = list(self.lbl_id_display["text"])
+class Widget_Login_Pad(object):
+    class Number_Button(object):
+        def update_id_display(self, input):
+            self.lbl_id_display = tk.Label(
+                master=self.display_master,
+                text="-  -  -  -",
+                font="Roboto 20",
+                bg="white",
+                fg="#2E7DDE",  
+                width=25
+            )
+            self.lbl_id_display.grid(
+                row=0,
+                column=0,
+                columnspan=4,
+                pady=15,
+                sticky="nesw"
+        )
 
-        for char in live_id_input:
-            if char == "-":
-                live_id_input[index] = str(btn_value)
+        def print_id(self, user_id):
+            print(user_id)
 
-                # if index + 2 > len(live_id_input):
-                #     live_id_input.after(500, login_controller)
-                # else:
-                #     return f"{''.join(live_id_input)}"
+        def id_display_controller(self):
+            index = 0
+            current_input = list(self.lbl_id_display["text"])
 
-            else:
-                index += 1
+            for char in current_input:
+                if char == "-":
+                    current_input[index] = str(self.btn_value)
+                    print(current_input)
+                    print(index)
 
-    class Number_Button:
-        def return_btn_value(self):
-            self.id_display_controller(self.btn_value)
-            print(self.btn_value)
+                    if index + 2 > len(current_input):
+                        self.lbl_id_display.configure(text=''.join(current_input))
+                        self.lbl_id_display.after(500, self.print_id(current_input))
+                    else:
+                        self.lbl_id_display.configure(text=''.join(current_input))
+                        return
 
-        def __init__(self, master, btn_value, btn_row, btn_column):
+                else:
+                    index += 1
+
+        def __init__(self, master, btn_value, btn_row, btn_column, display_master):
             self.master = master
             self.btn_value = btn_value
             self.btn_row = btn_row
             self.btn_column = btn_column
+            self.display_master = display_master
+
+            self.update_id_display("-  -  -  -")
 
             btn_number = tk.Button(
                 master=self.master,
                 text=f"{self.btn_value}",
-                command=self.return_btn_value,
+                command=self.id_display_controller,
                 relief=tk.FLAT,
                 font="Roboto 16 bold",
-                fg="#ffffff",
-                bg="#2E7DDE",
+                fg="#2E7DDE", #ffffff
+                bg="#2E7DDE", #2E7DDE
                 width=4
             )
             btn_number.grid(
@@ -170,22 +193,6 @@ class Widget_Login_Pad():
             column=0,
             columnspan=3,
             pady=10
-        )
-
-        self.lbl_id_display = tk.Label(
-            master=frm_login_pad,
-            text="-  -  -  -",
-            font="Roboto 20",
-            bg="white",
-            fg="#2E7DDE",  
-            width=25
-        )
-        self.lbl_id_display.grid(
-            row=0,
-            column=0,
-            columnspan=4,
-            pady=15,
-            sticky="nesw"
         )
 
         self.lbl_login_feedback = tk.Label(
@@ -219,10 +226,10 @@ class Widget_Login_Pad():
         button_counter = 1
         for btn_row in range(3):
             for btn_column in range(3):
-                self.Number_Button(frm_number_pad, button_counter, btn_row, btn_column)
+                self.Number_Button(frm_number_pad, button_counter, btn_row, btn_column, frm_login_pad)
                 button_counter += 1
         
-        self.Number_Button(frm_number_pad, 0, 3, 1)
+        self.Number_Button(frm_number_pad, 0, 3, 1, frm_login_pad)
 
 class View_Clock_In_Form():
     def __init__(self):
